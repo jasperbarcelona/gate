@@ -181,7 +181,6 @@ def message_options(msisdn, send_this):
             'mobile_number': msisdn,
             'secret_key': SECRET_KEY,
             'shortcode': SHORT_CODE,
-            'request_id': request_id,
             'message_id': uuid.uuid4().hex,
             'request_cost': 'P1.00'
         }
