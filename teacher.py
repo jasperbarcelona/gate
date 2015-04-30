@@ -177,7 +177,7 @@ def reply(msisdn, send_this, request_id):
             print "Too slow Mojo!"
             pass
 
-def message_options(msisdn, send_this):
+def message_options(send_this,msisdn):
     message_options = {
             'message_type': 'SEND',
             'message': send_this,
