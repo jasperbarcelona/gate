@@ -107,7 +107,7 @@ def reply(msisdn, send_this, request_id):
     while not sent:
         try:
             r = requests.post(
-                request_url,
+                SMS_URL,
                 reply_message_options(msisdn, send_this, request_id)
                 # timeout=(int(CONNECT_TIMEOUT))           
             )
