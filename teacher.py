@@ -142,7 +142,7 @@ def process_message(message_type, msisdn, shortcode, request_id, message, timest
     return SWJsonify({'Status': 'Accepted'})
 
 
-def send_message(message, msisdn,):
+def send_message(message, msisdn):
     sent = False
     while not sent:
         try:
@@ -179,7 +179,7 @@ def reply(msisdn, send_this, request_id):
 
 def message_options(msisdn, send_this):
     message_options = {
-            'message_type': 'REPLY',
+            'message_type': 'SEND',
             'message': send_this,
             'client_id': CLIENT_ID,
             'mobile_number': msisdn,
