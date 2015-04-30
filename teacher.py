@@ -122,7 +122,7 @@ def reply(msisdn, send_this, request_id):
 def reply_message_options(msisdn, send_this, request_id):
     message_options = {
             'message_type': 'REPLY',
-            'message': message,
+            'message': send_this,
             'client_id': CLIENT_ID,
             'mobile_number': msisdn,
             'secret_key': SECRET_KEY,
