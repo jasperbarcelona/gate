@@ -69,8 +69,7 @@ class Student(db.Model, Serializer):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
-    level = db.Column(db.String(20), default='None')
-    section = db.Column(db.String(30), default='None')
+    group = db.Column(db.String(30), default='None')
     msisdn = db.Column(db.String(12))
 
 class Teacher(db.Model, Serializer):
@@ -79,6 +78,30 @@ class Teacher(db.Model, Serializer):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
     msisdn = db.Column(db.String(12))
+
+class Group(db.Model, Serializer):
+    __public__ = ['id','name','msisdn']
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60))
+    teacher_id = db.Column(db.Integer)
+
+class Student_Group(db.Model, Serializer):
+    __public__ = ['id','name','msisdn']
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer)
+    group_id = db.Column(db.Integer)
+
+
+class IngAdmin(sqla.ModelView):
+    column_display_pk = True
+admin = Admin(app)
+admin.add_view(IngAdmin(Teacher, db.session))
+admin.add_view(IngAdmin(Student, db.session))
+admin.add_view(IngAdmin(Group, db.session))
+admin.add_view(IngAdmin(Student_Group, db.session))
+
 
 
 def check_msisdn(msisdn):
@@ -89,18 +112,49 @@ def check_msisdn(msisdn):
     else:
         return 'Not Found'
 
+
 def process_message(message_type, msisdn, shortcode, request_id, message, timestamp):
     if check_msisdn(msisdn) == 'teacher':
-        send_this = 'teacher\'s message:' + message.split(' ', 1)[0]
-        reply(msisdn, send_this, request_id)
+        send_to = message.split(' ', 1)[0]
+        send_this = message[:len(send_to)]
+        if send_to == 'all':
+            teacher = Teacher.query.filter_by(msisdn=msisdn).one().id
+            group = Group.query.filter_by(teacher_id=teacher).all()
+            for i in group:
+                student = Student_Group.query.filter_by(group_id=i.id).one().id
+                phone_number = Student.query.filter_by(id=student).one().msisdn
+                send_message(send_this, phone_number)                
+
+        remarks = 'Message sent to %s' %send_to
+        reply(msisdn, remarks, request_id)
+
 
     elif check_msisdn(msisdn) == 'student':
         print 'student\'s message:' + message
 
     else:
-        return False
+        send_this = 'Not Found'
 
-    return True
+    return SWJsonify({'Status': 'Accepted'})
+
+
+def send_message(message, msisdn,):
+    sent = False
+    while not sent:
+        try:
+            r = requests.post(
+                request_url,
+                message_options(message, msisdn)
+                # timeout=(int(CONNECT_TIMEOUT))           
+            )
+            sent =True
+            print r.text #update log database (put 'sent' to status)
+
+        except requests.exceptions.ConnectionError as e:
+            sleep(5)
+            print "Too slow Mojo!"
+            pass
+
 
 def reply(msisdn, send_this, request_id):
     sent = False
@@ -118,6 +172,20 @@ def reply(msisdn, send_this, request_id):
             sleep(5)
             print "Too slow Mojo!"
             pass
+
+def message_options(msisdn, send_this):
+    message_options = {
+            'message_type': 'REPLY',
+            'message': send_this,
+            'client_id': CLIENT_ID,
+            'mobile_number': msisdn,
+            'secret_key': SECRET_KEY,
+            'shortcode': SHORT_CODE,
+            'request_id': request_id,
+            'message_id': uuid.uuid4().hex,
+            'request_cost': 'P1.00'
+        }
+    return message_options
 
 def reply_message_options(msisdn, send_this, request_id):
     message_options = {
@@ -143,8 +211,8 @@ def receive_sms():
     message = flask.request.form.get('message')
     timestamp = flask.request.form.get('timestamp')
 
-    if process_message(message_type, mobile_number, shortcode, request_id, message, timestamp):
-        return SWJsonify({'Status': 'Accepted'})
+    if message_type and mobile_number and shortcode and request_id and message and timestamp:
+        return process_message(message_type, mobile_number, shortcode, request_id, message, timestamp)
 
     return SWJsonify({'Status': 'Error'})
 
@@ -159,15 +227,25 @@ def rebuild_database():
         msisdn = '639183339068'
         )
 
+    group = Group(
+        name = '4-Charity',
+        teacher_id = 1
+        )
+
     student = Student(
         name = 'Jasper Barcelona',
-        level = '2nd Grade',
-        section = 'Charity',
         msisdn = '639189123947'
+        )
+
+    student_group = Student_Group(
+        student_id = 1,
+        group_id = 1
         )
 
     db.session.add(teacher)
     db.session.add(student)
+    db.session.add(student_group)
+    db.session.add(group)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
