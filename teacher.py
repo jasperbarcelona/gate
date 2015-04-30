@@ -121,10 +121,10 @@ def process_message(message_type, msisdn, shortcode, request_id, message, timest
             teacher = Teacher.query.filter_by(msisdn=msisdn).one().id
             group = Group.query.filter_by(teacher_id=teacher).all()
             for i in group:
-                print 'group:' + i.id
+                print 'group:' + str(i.id)
                 student = Student_Group.query.filter_by(group_id=i.id).all()
                 for x in student:
-                    print 'student:' + x.id
+                    print 'student:' + str(x.id)
                     phone_number = Student.query.filter_by(id=x.id).one().msisdn
                     print 'msisdn:' + phone_number
                     send_message(send_this, phone_number)                
