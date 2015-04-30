@@ -116,7 +116,7 @@ def check_msisdn(msisdn):
 def process_message(message_type, msisdn, shortcode, request_id, message, timestamp):
     if check_msisdn(msisdn) == 'teacher':
         send_to = message.split(' ', 1)[0]
-        send_this = message[:len(send_to)]
+        send_this = message[len(send_to)+1:]
         if send_to == 'all':
             teacher = Teacher.query.filter_by(msisdn=msisdn).one().id
             group = Group.query.filter_by(teacher_id=teacher).all()
