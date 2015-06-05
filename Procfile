@@ -1,1 +1,1 @@
-web: python teacher.py
+web: python gate.py
