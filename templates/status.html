@@ -1,0 +1,12 @@
+<center>
+	{% if status == 'Home Owner' %}
+		<div id="circle" class="authorized">
+			{{status[:4]}}<br />
+			{{status[5:]}}
+		</div>
+	{% else %}
+		<div id="circle" class="unauthorized">
+			{{status}}
+		</div>
+	{% endif %}
+</center>

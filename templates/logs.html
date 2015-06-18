@@ -1,9 +1,10 @@
 {% for i in logs %}
-	<tr>
-		<td>{{i.entry_date}}</td>
-		<td>{{i.plate_no}}</td>
-		<td>{{i.make}}</td>
-		<td>{{i.model}}</td>
-		<td>{{i.entry}}</td>
-	</tr>
+<tr class="rows">
+	<td class="short">{{i.entry_date}}</td>
+	<td class="short">{{i.entry}}</td>
+	<td class="short">{{i.plate_no}}</td>
+	<td class="short">{{i.make}}</td>
+	<td class="short">{{i.model}}</td>
+	<td class="short">{{i.color}}</td>
+</tr>
 {% endfor %}

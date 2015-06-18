@@ -5,65 +5,68 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no">
 		<link rel="stylesheet" href="../static/css/bootstrap.min.css">
 		<link rel="stylesheet" href="../static/css/style.css">
-		<script src="../static/js/jquery-1.11.0.min.js"></script>
-		<script src="../static/js/animations.js"></script>
-
 		<title>Dashboard</title>
 	</head>
 	<body onload="startTime()">
+		<form id="id-number-input">	
+			<input type="text" id="plate_no" placeholder="Student Number"><br>
+			<input type="submit">
+		</form>
 		<div class="container">
-			<center>
-				<div id="log-panel" class="panel panel-default">
-					<div class="panel-heading">
-						Logs
-						<span id="seach-toggle" class="glyphicon glyphicon-search"></span>
-					</div>
-					<div class="panel-body">
-						<table id="log-table" class="table">
-							<tbody>
-								<tr>
-									<td><input data-provide="datepicker"></td>
-									<td><input type="text" class="form-control"></td>
-									<td><input type="text" class="form-control"></td>
-									<td><input type="text" class="form-control"></td>
-									<td><input type="text" class="form-control"></td>
-								</tr>
-								{% for i in logs %}
-								<tr>
-									<td>{{i.entry_date}}</td>
-									<td>{{i.plate_no}}</td>
-									<td>{{i.make}}</td>
-									<td>{{i.model}}</td>
-									<td>{{i.entry}}</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				</div>
+			<table class="table">
+				<thead>
+					<tr class="table-header">
+						<th class="short">Date</th>
+						<th class="short">Time</th>
+						<th class="short">Plate No</th>
+						<th class="short">Make</th>
+						<th class="short">Model</th>
+						<th class="short">Color</th>
+					</tr>
+					<tr class="search-panel">
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for i in logs %}
+					<tr class="rows">
+						<td class="short">{{i.entry_date}}</td>
+						<td class="short">{{i.entry}}</td>
+						<td class="short">{{i.plate_no}}</td>
+						<td class="short">{{i.make}}</td>
+						<td class="short">{{i.model}}</td>
+						<td class="short">{{i.color}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+			<div class="right">
 				<div id="current-panel" class="panel panel-default">
 					<div class="panel-heading">
-						Vehicle Information
+						Status
 					</div>
 					<div class="panel-body">
 						<center>
-							<div id="circle">
+							<div id="circle" class="ready">
 								Ready
 							</div>
 						</center>
 					</div>
 				</div>
-				<div id="time">
-					<span id="time-clock"></span>
-					<span id="date">{{date}}</span>
-				</div>
-			</center>
-			<form id="id-number-input">	
-				<input type="text" id="plate_no" placeholder="Student Number"><br>
-				<input type="submit">
-			</form>
+			</div>
+			<!-- <div id="time">
+				<span id="time-clock"></span>
+				<span id="date">{{date}}</span>
+			</div> -->
+			{% include 'keyboard.html' %}
 		</div>
-
+		<script src="../static/js/jquery-1.11.0.min.js"></script>
+		<script src="../static/js/animations.js"></script>
 		<script src="../static/js/bootstrap.min.js"></script>
 		<script src="../static/js/functions.js"></script>   
 	</body>

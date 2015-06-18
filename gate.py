@@ -60,13 +60,14 @@ def SWJsonify(*args, **kwargs):
         # from https://github.com/mitsuhiko/flask/blob/master/flask/helpers.py
 
 class Vehicle(db.Model, Serializer):
-    __public__ = ['id','sticker_no','plate_no','make','model']
+    __public__ = ['id','sticker_no','plate_no','make','model','color']
 
     id = db.Column(db.Integer, primary_key=True)
     sticker_no = db.Column(db.String(10))
     plate_no = db.Column(db.String(10))
     make = db.Column(db.String(30))
     model = db.Column(db.String(30))
+    color = db.Column(db.String(30))
 
 class Log(db.Model, Serializer):
     __public__ = ['id','sticker_no','plate_no','entry','exit']
@@ -79,7 +80,7 @@ class Log(db.Model, Serializer):
     make = db.Column(db.String(30))
     model = db.Column(db.String(30))
     entry = db.Column(db.String(10))
-    exit = db.Column(db.String(10), default='--')
+    color = db.Column(db.String(30))
     timestamp = db.Column(db.String(50))
 
 class IngAdmin(sqla.ModelView):
@@ -97,6 +98,7 @@ def log_entry(vehicle):
         make = vehicle.make,
         model = vehicle.model,
         entry = time.strftime("%H:%M %p"),
+        color = vehicle.color,
         timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
         )
     db.session.add(log)
@@ -135,17 +137,15 @@ def vehicle_authentication():
     sticker_no = flask.request.form.get('sticker_no')
     vehicle = Vehicle.query.filter_by(sticker_no=sticker_no).first()
     date = time.strftime("%B %d, %Y")
-    if vehicle:
-
+    if not vehicle:
         return flask.render_template(
-            'vehicle_info.html',
-            sticker_no=sticker_no,
-            plate_no=vehicle.plate_no,
-            make=vehicle.make,
-            model=vehicle.model
+            'status.html',
+            status='Unauthorized',
             )
-
-    return flask.render_template('unauthorized.html')
+    return flask.render_template(
+            'status.html',
+            status='Home Owner',
+            )
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
@@ -157,7 +157,12 @@ def log():
 
         return log_entry(vehicle)
 
-    return '', 204 
+    return '', 204
+
+
+@app.route('/favicon.ico',methods=['GET','POST'])
+def est():
+    return '',204
 
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
@@ -169,21 +174,24 @@ def rebuild_database():
         sticker_no = '1234',
         plate_no = 'UUE-918',
         make = 'Honda',
-        model = 'Civic'
+        model = 'Civic',
+        color = 'Beige'
         )
 
     vehicle1 = Vehicle(
         sticker_no = '4321',
         plate_no = 'UUE-345',
         make = 'Toyota',
-        model = 'Corolla'
+        model = 'Corolla',
+        color = 'Red'
         )
 
     vehicle2 = Vehicle(
         sticker_no = '4567',
         plate_no = 'UUA-345',
         make = 'Mitsubishi',
-        model = 'Lancer'
+        model = 'Lancer',
+        color = 'Orange'
         )
 
     db.session.add(vehicle)
